@@ -5,24 +5,62 @@ import { useState } from "react";
 
 export default function NewPost(props) {
   const [postContent, setPostContent] = useState("");
-  const handleClick = async () => {
+  const [topic, setTopic] = useState('');
+  const [keywords, setKeywords] = useState('');
+
+  const handleSubmit = async () => {
+    console.log("Fired Generate")
      
 
     const response = await fetch("/api/generatePost", {
-      method: "POST"
-    })
+      method: "POST",
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ topic, keywords }),
+    });
     const json = await response.json();
     console.log("RESULT", json)
     setPostContent(json.post.postContent)
   }
 
-    return <div>
-      <h1>This is the new post page</h1>
-      <button className="btn" onClick={handleClick}>
-        Generate
-      </button>
-      <div className="max-w-screen-sm p-10 text-center" dangerouslySetInnerHTML={{ __html: postContent}} />
-    </div>
+    return (
+    <div>
+      <form
+            onSubmit={handleSubmit}
+            className="m-auto w-full max-w-screen-sm bg-slate-100 p-4 rounded-md shadow-xl border border-slate-200 shadow-slate-200"
+          >
+          <div>
+              <label>
+                <strong>Generate a blog post on the topic of:</strong>
+              </label>
+              <textarea
+                className="resize-none border border-slate-500 w-full block my-2 px-4 py-2 rounded-sm"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                maxLength={80}
+              />
+            </div>
+            <div>
+              <label>
+                <strong>Targeting the following keywords:</strong>
+              </label>
+              <textarea
+                className="resize-none border border-slate-500 w-full block my-2 px-4 py-2 rounded-sm"
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
+                maxLength={80}
+              />
+              </div>
+              <button
+              type="submit"
+              className="btn"
+            >
+              Generate
+            </button>
+            </form>
+          <div className="max-w-screen-sm p-10 text-center" dangerouslySetInnerHTML={{ __html: postContent}} />
+    </div>)
   }
 
   NewPost.getLayout = function getLayout(page, pageProbs) {
