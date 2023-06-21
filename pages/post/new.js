@@ -8,9 +8,9 @@ export default function NewPost(props) {
   const [topic, setTopic] = useState('');
   const [keywords, setKeywords] = useState('');
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     console.log("Fired Generate")
-     
 
     const response = await fetch("/api/generatePost", {
       method: "POST",
@@ -22,12 +22,12 @@ export default function NewPost(props) {
     const json = await response.json();
     console.log("RESULT", json)
     setPostContent(json.post.postContent)
-  }
+}
 
-    return (
-    <div>
+
+    return (<div>
       <form
-            onSubmit={handleSubmit}
+            onSubmit={(event) => handleSubmit(event)}
             className="m-auto w-full max-w-screen-sm bg-slate-100 p-4 rounded-md shadow-xl border border-slate-200 shadow-slate-200"
           >
           <div>
