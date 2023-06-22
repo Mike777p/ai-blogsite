@@ -1,10 +1,24 @@
 import {Configuration,  OpenAIApi} from "openai"
-// const topic = "the importance of dental hygiene " 
-// const keywords = "infection prevention antibiotics"
+import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0"
+import clientPromise from "../../lib/mongodb";
+
 const botType = "blog post"
 const model = "gpt-3.5-turbo"
 
-export default async function handler(req, res) {
+export default withApiAuthRequired(async function handler(req, res) {
+  const {user} = await getSession(req, res);
+  const client = await clientPromise;
+  const db = client.db("blogStandard");
+  console.log("User -> ", user)
+
+  const userProfile = await db.collection("users").findOne(
+    {auth0Id : user.sub});
+
+    if (!userProfile?.availableTokens) {
+      res.status(403);
+      return
+    }
+
     const config = new Configuration({
         apiKey : process.env.OPENAI_API_KEY
     });
@@ -89,6 +103,25 @@ export default async function handler(req, res) {
             console.log('TITLE: ', title);
             console.log('META DESCRIPTION: ', metaDescription);
 
+            await db.collection("users").updateOne(
+              {auth0Id : user.sub},
+              {
+                $inc : { availableTokens : -1}
+              })
+
+            const posts = await db.collection("posts").insertOne(
+              {
+                postContent :postContent,
+                title : title,
+                metaDescription : metaDescription,
+                keywords : keywords,
+                topic : topic,
+                userId : userProfile._id,
+                userInfo : userProfile,
+                created : new Date(),
+            },
+            );
+
             res.status(200).json({
                 post: {
                     postContent,
@@ -97,5 +130,5 @@ export default async function handler(req, res) {
                 },
             })
           
-  }
+  })
   
