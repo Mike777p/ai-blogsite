@@ -109,7 +109,7 @@ export default withApiAuthRequired(async function handler(req, res) {
                 $inc : { availableTokens : -1}
               })
 
-            const posts = await db.collection("posts").insertOne(
+            const post = await db.collection("posts").insertOne(
               {
                 postContent :postContent,
                 title : title,
@@ -119,16 +119,16 @@ export default withApiAuthRequired(async function handler(req, res) {
                 userId : userProfile._id,
                 userInfo : userProfile,
                 created : new Date(),
-            },
-            );
+            });
+            //  Will return the following:         {
+                                                    //   acknowledged: true,
+                                                    //   insertedId: new ObjectId("6495dba67ba26ecbb3402etc")
+                                                    // }
 
-            res.status(200).json({
-                post: {
-                    postContent,
-                    title,
-                    metaDescription
-                },
-            })
+
+            res.status(200).json(
+                { postId: post.insertedId}
+            )
           
   })
   
