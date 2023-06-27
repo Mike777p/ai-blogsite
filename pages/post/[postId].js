@@ -4,9 +4,10 @@ import clientPromise from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHashtag } from "@fortawesome/free-solid-svg-icons";
+import { getAppProps } from "../../Utils/getAppProps";
 
 export default function BlogPost(props) {
-  console.log("PROPS-> ", props)
+  // console.log("PROPS-> ", props)
     return <div className="overflow-auto h-full">
               <div className="max-w-screen-sm mx-auto ">
               <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
@@ -43,6 +44,8 @@ export default function BlogPost(props) {
 
   export const getServerSideProps = withPageAuthRequired({
     async getServerSideProps(ctx){
+      const props = await getAppProps(ctx);
+
       const userSession = await getSession(ctx.req, ctx.res);
       
       const client = await clientPromise;
@@ -71,6 +74,7 @@ export default function BlogPost(props) {
         metaDescription: post.metaDescription,
         keywords: post.keywords,
         topic: post.topic,
+        ...props,
       }}      
 
     }
