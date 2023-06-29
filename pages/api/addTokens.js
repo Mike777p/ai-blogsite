@@ -30,13 +30,6 @@ export default async function handler(req, res) {
       },
     });
 
-    const client = await clientPromise;
-    const db = client.db("blogStandard")
-
-    const userProfile = await db.collection("users").updateOne(
-          {auth0Id : user.sub},
-          {$inc : {availableTokens : 10}, $setOnInsert : {auth0Id : user.sub, email : user.email, emailVerified : user.email_verified, picture : user.picture, nickname : user.nickname, name : user.name}}
-          ,{upsert : true})
 
           res.status(200).json({ session: checkoutSession });
   }
